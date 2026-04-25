@@ -1,119 +1,102 @@
-import bcrypt from "bcrypt"
-// import users from "./../models/userModel.js"
-import fs from "fs"
+import bcrypt from "bcryptjs"
+import User from "./../models/user.model.js"
+import { generateToken } from "../lib/utils.js"
 
-export const signup=async(req,res)=>{
-    const {username,email,password}=req.body
+export const signup = async(req,res)=>{
+    const {username,email,password} = req.body
     try{
-        if(!username||!email||!password) return res.status(400).json({message:"all fields are required"})
-        if(password.length<6) return res.status(400).json({
-            message:"password must be a minimum of 6 characters"
+        if(!username || !email || !password){
+            return res.status(400).json({message:"All fields are required"})
+        }
+
+        if(password.length<6){
+            return res.status(400).json({
+                message:"password must be atleast 6 characters"
+            })
+        }
+
+        const user = await User.findOne({email})
+
+        if(user) return res.status(400).json({
+            message:"User already exists"
         })
-        const user = users.findOne(username)
-        if(user) return res.status(400).json({message:"username already exists"})
-        const salt=await bcrypt.genSalt(10);
-        const hashed=await bcrypt.hash(password,salt)
-        const newUser=new users({
+
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password,salt)
+
+        const newUser = new User({
             username,
             email,
-            password:hashed
+            password:hashedPassword
         })
+
         if(newUser){
-            const token=generateToken(username,res)
+            const token = generateToken(newUser._id,res)
             await newUser.save()
-            res.status(201).status({
-                username:newUser.username,
-                email:newUser.email,
+            res.status(201).json({
+                _id:newUser._id,
+                username: newUser.username,
+                email: newUser.email,
+                profilePic: newUser.profilePic
             })
         }else{
-            res.status(400).json({message:"invalid"})
+            res.status(400).json({message:"invalid user data"})
         }
+    
     }catch(error){
-        console.log("error in signup controller",error.message)
-        res.status(500).json({message:"internal server error"})
+        console.log("Error in signup controller", error.message)
+        res.status(500).json({message:"Internal Server Error"})
     }
 }
 
-export const create=async(req,res)=>{
-    const {username,email,password}=req.body
+export const login = async(req,res)=>{
+    const {email,password} = req.body
     try{
-        if(!username||!email||!password) return res.status(400).json({message:"all fields are required"})
-        if(password.length<6) return res.status(400).json({
-            message:"password must be a minimum of 6 characters"
-        })
-        const data=JSON.parse(fs.readFileSync("./src/userData/db.json","utf8"))
-        const dup=data.slice(1).find((curr)=>(curr.username===username||curr.email===email))
-        if(dup){
-            return res.status(400).json({message:"duplicate credentials"})
+        const user = await User.findOne({email})
+        if(!user){
+            return res.status(400).json({message:"User not found"})
         }
-        const salt=await bcrypt.genSalt(10)
-        const hashed=await bcrypt.hash(password,salt)
-        const count=data[0].count++
-        const user={
-            id:count,
-            username,
-            email,
-            password:hashed
+        const isPasswordCorrect = await bcrypt.compare(password,user.password)
+
+        if(!isPasswordCorrect){
+            return res.status(400).json({message:"invalid credentials"})
         }
-        data.push(user)
-        fs.writeFileSync("./src/userData/db.json",JSON.stringify(data,null,2))
-        res.status(201).json({
-            username,
-            email
-        })
-    }catch(error){
-        console.log("error in signup controller",error.message)
-        res.status(500).json({message:"internal server error"})
-    }
-}
 
-export const getAll=async(req,res)=>{
-    try{
-    const data =JSON.parse(fs.readFileSync("./src/userData/db.json","utf8"))
-    const finalData=data.slice(1).map(({password,...rest})=>rest)
-    res.status(200).json({
-        users:finalData
-    })
-    }catch(error){
-        console.log("error in getAll controller",error.message)
-        res.status(500).json({message:"internal server error"})
-    }   
-}
+        const token=generateToken(user._id,res)
 
-export const deleteUser=async(req,res)=>{
-    const username=req.params.username
-    try{
-        if(!username) return res.status(400).json({message:"username is required"})
-        const data =JSON.parse(fs.readFileSync("./src/userData/db.json","utf8"))
-        if((data.slice(1).find(curr=>curr.username===username))==null) return res.status(400).json({message:"user doesnt exist"})
-        data.splice((data.slice(1).findIndex(curr=>curr.username===username))+1,1)
-        fs.writeFileSync("./src/userData/db.json",JSON.stringify(data,null,2))
         res.status(200).json({
-            message:"deletion successful"
+            _id:user._id,
+            username: user.username,
+            email: user.email,
+            profilePic: user.profilePic,
+            token
         })
     }catch(error){
-        console.log("error in deleteUser controller",error.message)
-        res.status(500).json({message:"internal server error"})
+        console.log("Error in login controller", error.message)
+        res.status(500).json({message:"Internal Server Error"})
     }
 }
 
-export const updateUser=async(req,res)=>{
-    const username=req.params.username
-    const newUsername=req.query.newUsername
+export const logout = async(req,res)=>{
     try{
-        if(!username||!newUsername) return res.status(400).json({message:"username is required"})
-        const data =JSON.parse(fs.readFileSync("./src/userData/db.json","utf8"))
-        let index=data.slice(1).findIndex(curr=>curr.username===username)
-        let newIndex=data.slice(1).findIndex(curr=>curr.username===newUsername)
-        if(index==-1) return res.status(400).json({message:"username doesnt exist"})
-        if(newIndex!=-1) return res.status(400).json({message:"username already exists"})
-        data[index+1].username=newUsername
-        fs.writeFileSync("./src/userData/db.json",JSON.stringify(data,null,2))
-        res.status(200).json({
-            message:"updation successful"
+        res.cookie("jwt","",{
+            maxAge:0,
+            httpOnly:true,
+            sameSite:"none",
+            secure:process.env.NODE_ENV !== "development"
         })
+        res.status(200).json({message:"Logged Out Succesfully"})
     }catch(error){
-        console.log("error in updateUser controller",error.message)
+        console.log("Error in logout controller", error.message)
+        res.status(500).json({message:"Internal Server Error"})
+    }
+}
+
+export const checkAuth = (req,res) =>{
+    try{
+        res.status(200).json(req.user)
+    }catch(error){
+        console.log("error in checkauth controller",error.message)
         res.status(500).json({message:"internal server error"})
     }
 }
