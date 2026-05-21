@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/useAuthStore'
 
 const socket=io("http://localhost:5001",{
   autoConnect:false,
+  withCredentials:true
 })
 
 function Sync({boardId,roomCode}){
