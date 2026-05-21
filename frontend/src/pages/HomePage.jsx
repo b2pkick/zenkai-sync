@@ -7,7 +7,7 @@ import 'tldraw/tldraw.css'
 import { io } from 'socket.io-client'
 import { useAuthStore } from '@/store/useAuthStore'
 
-const socket=io("http://localhost:5001",{
+const socket=io("https://zenkai-sync-wv5o.onrender.com",{
   autoConnect:false,
   withCredentials:true
 })
