@@ -8,6 +8,7 @@ import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
 import ProfilePage from './pages/ProfilePage'
+import LandingPage from './pages/LandingPage'
 import './App.css'
 
 function App() {
@@ -26,15 +27,15 @@ function App() {
   )
 
   return (
-      <div className='w-screen h-screen flex flex-col justify-center items-center bg-white'>
-      {/* <Navbar /> */}
+      <div className='w-full h-full flex flex-col justify-center items-center bg-white'>
 
       <div><Toaster className="bg-black"
       position="bottom-right"
       reverseOrder={true}
       /></div>
       <Routes>
-        <Route path='/' element={authUser?<HomePage />:<Navigate to="/login" />} />
+        <Route path='/' element={authUser?<LandingPage />:<Navigate to="/login" />} />
+        <Route path='/canvas/:id' element={authUser?<HomePage />:<Navigate to="/login" />} />
         <Route path='/signup' element={!authUser?<SignUpPage />:<Navigate to="/" />} />
         <Route path='/login' element={!authUser?<LoginPage />:<Navigate to="/" />} />
         <Route path='/profile' element={authUser ? <ProfilePage />:<Navigate to="/login" />}  />

@@ -78,3 +78,7 @@
   font-optical-sizing: auto;
   font-style: normal;
 }
+
+.tl-watermark_SEE-LICENSE {
+  display: none !important;
+}
