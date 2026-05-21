@@ -8,7 +8,7 @@ const server=http.createServer(app)
 
 const io=new Server(server,{
     cors:{
-        origin:["http://localhost:5173","https://zenkai-sync-git-main-b2psicks-projects.vercel.app"],
+        origin:["http://localhost:5173","https://zenkai-sync-pu8ah2ctg-b2psicks-projects.vercel.app"],
         credentials:true
     }
 })
