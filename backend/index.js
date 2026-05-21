@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser"
 import {app} from "./src/lib/socket.js"
 
 app.use(cors({
-    origin:["http://localhost:5173","https://zenkai-sync-pu8ah2ctg-b2psicks-projects.vercel.app"],
+    origin:["http://localhost:5173","https://zenkai-sync.vercel.app"],
     credentials:true
 }))
 app.use(cookieParser())
