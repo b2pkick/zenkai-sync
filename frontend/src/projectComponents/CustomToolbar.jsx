@@ -130,7 +130,7 @@ export default function CustomToolbar({roomCode}) {
       </button>
       <button onClick={()=>editor.setStyleForNextShapes(DefaultColorStyle, 'green')} className={"bg-green-500 w-7 h-7 rounded-full border-2"}>
       </button>
-      <button onClick={()=>editor.setStyleForNextShapes(DefaultColorStyle, 'pink')} className={"bg-pink-500 w-7 h-7 rounded-full border-2"}>
+      <button onClick={()=>editor.setStyleForNextShapes(DefaultColorStyle, 'light-bblue')} className={"bg-blue-300 w-7 h-7 rounded-full border-2"}>
       </button>
     </div>
     <p className='text-xl absolute right-3 top-44'>{roomCode}</p>
