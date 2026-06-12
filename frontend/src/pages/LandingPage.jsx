@@ -15,6 +15,12 @@ const LandingPage = () => {
   const {authUser} = useAuthStore();
   const {boards,getBoards,initializeBoard,deleteBoard,isFetchingBoards,isInitializing,isDeleting,joinBoardByCode} = useBoardStore();
 
+  const {logout} =useAuthStore()
+
+  const logoutt=async()=>{
+    await logout()
+  }
+
   useEffect(() => {
     getBoards()
   },[getBoards])
@@ -52,15 +58,12 @@ const LandingPage = () => {
             Welcome <span className="">{authUser?.username||"user"}</span>
           </h1>
           <p className="text-[13px] sm:text-xl">
-            {boards.length>0 ?"Here are your synced documents" : "You currently have no documents"}
+            {boards.length>0 ?"here are your documents" : "you currently have no documents"}
           </p>
           </div>
-          <Link to="/profile">
-          <Avatar>
-            <AvatarImage src={authUser.profilePic||avatar} alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          </Link>
+          <Button className={"bg-white text-black h-8 w-15 md:h-10 md:w-20 text-[10px] md:text-[15px]"} onClick={logoutt}>
+            logout
+          </Button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           <div

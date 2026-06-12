@@ -2,6 +2,7 @@ import React from 'react'
 import { useEditor,GeoShapeGeoStyle,DefaultColorStyle,DefaultDashStyle} from 'tldraw'
 import { Button } from '@/components/ui/button'
 import { Pen, Hand, Square, Circle, Diamond ,TextCursor, Eraser, Undo, Redo, ArrowBigUpIcon, ArrowBigRight, LineSquiggle, MousePointer2} from 'lucide-react'
+import { useAuthStore } from '@/store/useAuthStore'
 
 export default function CustomToolbar({roomCode}) {
   const editor = useEditor()
@@ -10,6 +11,7 @@ export default function CustomToolbar({roomCode}) {
     editor.setStyleForNextShapes(DefaultDashStyle,'solid')
     editor.setCurrentTool('geo')
   }
+
 
   const imageExport=async()=>{
     const shapeIds=editor.getCurrentPageShapes().map((shape)=>shape.id)
@@ -133,7 +135,7 @@ export default function CustomToolbar({roomCode}) {
       <button onClick={()=>editor.setStyleForNextShapes(DefaultColorStyle, 'light-blue')} className={"bg-blue-300 w-7 h-7 rounded-full border-2"}>
       </button>
     </div>
-    <p className='text-xl absolute right-3 top-44'>{roomCode}</p>
+    <p className='text-xl absolute right-2 top-44'>{roomCode}</p>
     </div>
   )
 }
